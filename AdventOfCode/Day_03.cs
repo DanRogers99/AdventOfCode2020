@@ -8,27 +8,16 @@ namespace AdventOfCode
 {
     public class Day_03 : BaseDay
     {
-        private readonly string _input;
+        private readonly List<List<char>> _inputList;
         private readonly int _totalchar;
-        private readonly List<char[]> _inputList;
 
         public Day_03()
         {
-            _input = File.ReadAllText(InputFilePath);
-            _inputList = new List<char[]>();
-
-            foreach (var line in _input.Split("\n"))
-            {
-                _inputList.Add(line.ToCharArray());
-            }
-
-            _totalchar = _inputList[0].Length;
+            _inputList = File.ReadAllText(InputFilePath).Split("\n").Select(line => line.ToCharList()).ToList();
+            _totalchar = _inputList[0].Count();
         }
 
-        public override string Solve_1()
-        {
-            return CalculateTrees(3, 1).ToString();
-        }
+        public override string Solve_1() => CalculateTrees(3, 1).ToString();
 
         public override string Solve_2()
         {
@@ -46,21 +35,21 @@ namespace AdventOfCode
             int treecount = 0;
             int charCounter = 0;
 
-            for (int i = 0; i < _inputList.Count - 1; i++)
+            for (int rowCount = 0; rowCount < _inputList.Count - 1; rowCount++)
             {
-                if (_inputList[i][charCounter] == '#')
+                if (_inputList[rowCount][charCounter] == '#')
                 {
                     treecount++;
                 }
 
-                charCounter = charCounter + right;
+                charCounter += right;
 
                 if (charCounter >= _totalchar)
                 {
-                    charCounter = charCounter - _totalchar;
+                    charCounter -= _totalchar;
                 }
 
-                i = i + down - 1;
+                rowCount += down - 1;
             }
 
             return treecount;
