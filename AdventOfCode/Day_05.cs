@@ -18,44 +18,10 @@ namespace AdventOfCode
             foreach (var line in File.ReadAllLines(InputFilePath))
             {
                 if (!string.IsNullOrWhiteSpace(line))
-                {
-                    int rowLower = 0;
-                    int rowHigher = 127;
-
-                    int seatLower = 0;
-                    int seatHigher = 7;
-
-                    for (int i = 0; i < 7; i++)
-                    {
-                        int difference = (int)Math.Ceiling((decimal)(rowHigher - rowLower) / 2);
-
-                        switch (line[i])
-                        {
-                            case 'F':
-                                rowHigher -= difference;
-                                break;
-                            case 'B':
-                                rowLower += difference;
-                                break;
-                        }
-                    }
-
-                    for (int i = 7; i < 10; i++)
-                    {
-                        int difference = (int)Math.Ceiling((decimal)(seatHigher - seatLower) / 2);
-
-                        switch (line[i])
-                        {
-                            case 'L':
-                                seatHigher -= difference;
-                                break;
-                            case 'R':
-                                seatLower += difference;
-                                break;
-                        }
-                    }
-
-                    _tickets.Add(new (rowLower, seatLower, (rowLower * 8) + seatLower));
+                { 
+                    var row = Convert.ToInt32(line.Substring(0, 7).Replace('F', '0').Replace('B', '1'), 2);
+                    var seat = Convert.ToInt32(line.Substring(7, 3).Replace('L', '0').Replace('R', '1'), 2);
+                    _tickets.Add(new (row, seat, (row * 8) + seat));
                 }
             }
         }
