@@ -37,7 +37,7 @@ namespace AdventOfCode
             var count = 0;
             foreach (var group in _groups)
             {
-                count += group.SelectMany(x => x.Distinct()).ToList().Distinct().Count();
+                count += group.SelectMany(x => x).ToList().Distinct().Count();
             }
 
             return count.ToString();
@@ -48,7 +48,7 @@ namespace AdventOfCode
             var count = 0;
             foreach (var group in _groups)
             {
-                count += group.SelectMany(x => x.Distinct()).ToList().GroupBy(letter => letter).Where(letter => letter.Count() == group.Count).Count();
+                count += group.SelectMany(x => x).ToList().GroupBy(letter => letter).Where(letter => letter.Count() == group.Count).Count();
             }
 
             return count.ToString();
