@@ -1,5 +1,4 @@
 ﻿using AoCHelper;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +13,7 @@ namespace AdventOfCode
         public Day_03()
         {
             _inputList = File.ReadAllText(InputFilePath).Split("\n").Select(line => line.ToCharList()).ToList();
-            _totalchar = _inputList[0].Count();
+            _totalchar = _inputList[0].Count;
         }
 
         public override string Solve_1() => CalculateTrees(3, 1).ToString();
