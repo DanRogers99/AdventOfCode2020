@@ -18,7 +18,7 @@ namespace AdventOfCode
             ticketInfo = new TicketInfo
             {
                 Category = file[0].Split("\n").ToList(),
-                YourTicket = file[1].Replace("your ticket:\n", "").Split(",").ToList(),
+                YourTicket = file[1].Replace("your ticket:\n", "").Split(",").Select(x => int.Parse(x)).ToList(),
                 NearbyTicket = file[2].Replace("nearby tickets:\n", "")
                                       .Split('\n')
                                       .Select(item => item.Split(",").Select(x => int.Parse(x)).ToList())
@@ -29,26 +29,19 @@ namespace AdventOfCode
         public override string Solve_1()
         {
             List<int> validNumbers = new List<int>();
+            List<int> invalidTicketItems = new List<int>();
 
             foreach (var category in ticketInfo.Category)
             {
-                foreach (var range in category.Split(":")[1].Split("or").Select(x => x.Split("-")).ToList())
-                {
-                    validNumbers.AddRange(Enumerable.Range(int.Parse(range[0]), int.Parse(range[1]) + 1 - int.Parse(range[0])).ToList());
-                }
+                var cat = category.Split(new string[] { ":", " or ", "-" }, StringSplitOptions.RemoveEmptyEntries).Skip(1).Select(x => int.Parse(x)).ToList();
+                validNumbers.AddRange(Enumerable.Range(cat[0], cat[1] + 1 - cat[0]).ToList());
+                validNumbers.AddRange(Enumerable.Range(cat[2], cat[3] + 1 - cat[2]).ToList());
             }
 
-            List<int> invalidTicketItems = new List<int>();
 
             foreach (var nearbyTicket in ticketInfo.NearbyTicket)
             {
-                foreach (var ticket in nearbyTicket)
-                {
-                    if (!validNumbers.Contains(ticket))
-                    {
-                        invalidTicketItems.Add(ticket);
-                    }
-                }
+                invalidTicketItems.AddRange(nearbyTicket.Where(ticket => !validNumbers.Contains(ticket)));
             }
 
             foreach (var invalidTicketItem in invalidTicketItems)
@@ -56,7 +49,6 @@ namespace AdventOfCode
                 var invalidTicket = ticketInfo.NearbyTicket.Where(x => x.Contains(invalidTicketItem)).FirstOrDefault();
                 _ = ticketInfo.NearbyTicket.Remove(invalidTicket);
             }
-
 
             return invalidTicketItems.Sum().ToString();
         }
@@ -70,17 +62,14 @@ namespace AdventOfCode
                 tempTicketMapping.Add(item.Split(":")[0], new List<int>());
             }
 
-
             for (int i = 0; i < ticketInfo.NearbyTicket.FirstOrDefault().Count; i++)
             {
                 foreach (var item in ticketInfo.Category)
                 {
-                    var categoryName = item.Split(":")[0];
-                    var range = item.Split(":")[1].Split("or").Select(x => x.Split("-")).ToList();
-
-                    if (CheckValues(ticketInfo.NearbyTicket.Select(x => x[i]), range))
+                    var cat = item.Split(new string[] { ":", " or ", "-" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                    if (CheckValues(ticketInfo.NearbyTicket.Select(x => x[i]), cat))
                     {
-                        tempTicketMapping[categoryName].Add(i);
+                        tempTicketMapping[cat[0]].Add(i);
                     }
                 }
             }
@@ -97,7 +86,7 @@ namespace AdventOfCode
                 ticketMapping.Add(value.Key, value.Value.FirstOrDefault());
 
                 tempTicketMapping.Remove(value.Key);
-                
+
                 foreach (var item in tempTicketMapping.Where(x => x.Value.Contains(value.Value.FirstOrDefault())))
                 {
                     item.Value.Remove(value.Value.FirstOrDefault());
@@ -108,20 +97,18 @@ namespace AdventOfCode
 
             foreach (var item in ticketMapping.Where(x => x.Key.StartsWith("departure")))
             {
-                answer *= int.Parse(ticketInfo.YourTicket[item.Value]);
+                answer *= ticketInfo.YourTicket[item.Value];
             }
 
             return answer.ToString();
         }
 
-        private static bool CheckValues(IEnumerable<int> checkValues, List<string[]> ranges)
+        private static bool CheckValues(IEnumerable<int> checkValues, List<string> r)
         {
             List<int> validNumbers = new List<int>();
+            validNumbers.AddRange(Enumerable.Range(int.Parse(r[1]), int.Parse(r[2]) + 1 - int.Parse(r[1])).ToList());
+            validNumbers.AddRange(Enumerable.Range(int.Parse(r[3]), int.Parse(r[3]) + 1 - int.Parse(r[2])).ToList());
 
-            foreach (var range in ranges)
-            {
-                validNumbers.AddRange(Enumerable.Range(int.Parse(range[0]), int.Parse(range[1]) + 1 - int.Parse(range[0])).ToList());
-            }
 
             foreach (var value in checkValues)
             {
@@ -136,7 +123,7 @@ namespace AdventOfCode
         public class TicketInfo
         {
             public List<string> Category { get; set; }
-            public List<string> YourTicket { get; set; }
+            public List<int> YourTicket { get; set; }
             public List<List<int>> NearbyTicket { get; set; }
         }
     }
